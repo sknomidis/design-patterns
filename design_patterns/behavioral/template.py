@@ -1,4 +1,8 @@
-"""Define an algorithm's skeleton, and let subclasses override individual steps."""
+"""Define an algorithm's skeleton, and let subclasses override individual steps.
+
+Similar to the Strategy pattern, but favors inheritance over delegation. This
+minimizes extra code, at the cost of reduced flexibility.
+"""
 
 from __future__ import annotations
 

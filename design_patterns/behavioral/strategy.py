@@ -1,4 +1,8 @@
-"""Change the behavior of an object dynamically."""
+"""Separate a generic algorithm from its context.
+
+It is very similar to the Template pattern, but uses delegation instead of
+inheritance. This, in turn, gives more flexibility at the cost of more code.
+"""
 
 from __future__ import annotations
 
@@ -27,8 +31,8 @@ class ReverseFormatter(TextFormatter):
 
 
 class TextEditor:
-    def __init__(self, formatter: TextFormatter | None = None) -> None:
-        self._formatter = formatter or PlainFormatter()
+    def __init__(self, formatter: TextFormatter) -> None:
+        self._formatter = formatter
 
     def publish(self, text: str) -> str:
         return self._formatter.format(text)
@@ -38,7 +42,7 @@ class TextEditor:
 
 
 if __name__ == "__main__":
-    editor = TextEditor()
+    editor = TextEditor(PlainFormatter())
     print(editor.publish("hello world"))
 
     editor.set_formatter(UpperCaseFormatter())
