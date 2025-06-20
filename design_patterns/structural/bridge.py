@@ -1,55 +1,99 @@
-"""Untangle a complicated class hierarchy.
-
-It decouples an abstraction from its implementation, so that the two can vary
-independently.
-"""
+"""Decouple layered class hierarchies having different degrees of freedom."""
 
 from __future__ import annotations
 
 import abc
 
+"""Layered class hierarchy.
 
-class DrawingAPI(abc.ABC):
-    """Responsible for drawing the circle."""
+Notice how a new variant must be written twice (once for each interface),
+while a new interface will introduce two variants.
+"""
+
+# Top layer
+
+
+class Base(abc.ABC):
+    @abc.abstractmethod
+    def method(self) -> None: ...
+
+
+# Intermediate layer (1st degree of freedom)
+
+
+class Interface1(Base, abc.ABC):
+    @abc.abstractmethod
+    def method(self) -> None: ...
+
+
+class Interface2(Base, abc.ABC):
+    @abc.abstractmethod
+    def method(self) -> None: ...
+
+
+# Bottom layer (2nd degree of freedom)
+
+
+class Interface1Variant1(Interface1):
+    def method(self) -> None:
+        pass
+
+
+class Interface1Variant2(Interface1):
+    def method(self) -> None:
+        pass
+
+
+class Interface2Variant1(Interface2):
+    def method(self) -> None:
+        pass
+
+
+class Interface2Variant2(Interface2):
+    def method(self) -> None:
+        pass
+
+
+"""Bridge pattern to the rescue!
+
+Each variant is now injected to the interface, thus decoupling the two. The
+interface is closed against a new variant, and vice versa.
+"""
+
+# 1st degree of freedom
+
+
+class Base(abc.ABC):
+    def __init__(self, variant: Variant) -> None:
+        self._variant = variant
 
     @abc.abstractmethod
-    def draw_circle(self, x: float, y: float, radius: float) -> None: ...
+    def method(self) -> None: ...
 
 
-class DrawingAPIOne(DrawingAPI):
-    """Method 1 for drawing a circle."""
-
-    def draw_circle(self, x: float, y: float, radius: float) -> None:
-        print(f"API 1 drawing a circle with radius {radius} at ({x}, {y})!")
+class Interface1(Base, abc.ABC):
+    @abc.abstractmethod
+    def method(self) -> None: ...
 
 
-class DrawingAPITwo(DrawingAPI):
-    """Method 2 for drawing a circle."""
-
-    def draw_circle(self, x: float, y: float, radius: float) -> None:
-        print(f"API 2 drawing a circle at ({x}, {y}) with radius {radius}!")
+class Interface2(Base, abc.ABC):
+    @abc.abstractmethod
+    def method(self) -> None: ...
 
 
-class Circle:
-    """Responsible only for representing a circle, but not for drawing it."""
-
-    def __init__(self, x: float, y: float, radius: float, drawing_api: DrawingAPI) -> None:
-        self._x = x
-        self._y = y
-        self._radius = radius
-        self._drawing_api = drawing_api
-
-    def draw(self) -> None:
-        # Implementation specific logic taken care of by another class
-        self._drawing_api.draw_circle(self._x, self._y, self._radius)
-
-    def scale(self, percent: float) -> None:
-        self._radius *= percent
+# 2nd degree of freedom
 
 
-if __name__ == "__main__":
-    circle_1 = Circle(1.0, 2.0, 3.0, DrawingAPIOne())
-    circle_1.draw()
+class Variant(abc.ABC):
+    @abc.abstractmethod
+    def method(self) -> None: ...
 
-    circle_2 = Circle(2.0, 3.0, 4.0, DrawingAPITwo())
-    circle_2.draw()
+
+class Variant1(Variant):
+    def method(self) -> None:
+        pass
+
+
+class Variant2(Variant):
+    def method(self) -> None:
+        pass
