@@ -1,4 +1,8 @@
-"""Build tree data structures and interact with nodes and leaves the same way."""
+"""Achieve a one-to-many behavior without implementing one-to-many relationship.
+
+Since one-to-one relationships are much easier to understand, this tends to
+simplify usage logic.
+"""
 
 from __future__ import annotations
 

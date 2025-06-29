@@ -1,40 +1,25 @@
-"""Convert the interface of a class to what the client expects.
-
-It acts as a translator between two incompatible interfaces.
-"""
+"""Adapt an incompatible interface to what the client expects."""
 
 from __future__ import annotations
 
-
-class USPlug:
-    def get_power(self) -> str:
-        return "120V power from US plug"
+import abc
 
 
-class EuropeanSocket:
-    def provide_electricity(self) -> str:
-        return "220V power from European socket"
+class ClientInterface(abc.ABC):
+    @abc.abstractmethod
+    def run(self) -> None: ...
 
 
-class EuropeanToUsAdapter(USPlug):
-    def __init__(self, european_socket: EuropeanSocket) -> None:
-        self._european_socket = european_socket
-
-    def get_power(self) -> str:
-        power = self._european_socket.provide_electricity()
-        return power
+class ActualInterface(abc.ABC):
+    @abc.abstractmethod
+    def execute(self) -> None: ...
 
 
-def power_service(us_plug: USPlug) -> None:
-    print(us_plug.get_power())
+# The client can now use the `ActualInterface`, even though it has an
+# incompatible interface.
+class Adapter(ClientInterface):
+    def __init__(self, actual_interface: ActualInterface) -> None:
+        self._actual_interface = actual_interface
 
-
-if __name__ == "__main__":
-    # Works normally
-    us_plug = USPlug()
-    power_service(us_plug)
-
-    # To make EU socket work, we wrap it with an adapter
-    eu_socket = EuropeanSocket()
-    adapter = EuropeanToUsAdapter(eu_socket)
-    power_service(adapter)
+    def run(self) -> None:
+        self._actual_interface.execute()
